@@ -1,0 +1,141 @@
+SEQUENCE ResultadoRDV
+	SEQUENCE cabecalho
+		GENERAL STRING dataGeracao
+		CHOICE idEleitoral
+			{1:idProcessoEleitoral,2:idPleito,3:idEleicao}
+	SEQUENCE urna
+		ENUMERATED tipoUrna
+			{1:secao,3:contingencia,4:reservaSecao,6:reservaEncerrandoSecao}
+		GENERAL STRING versaoVotacao
+		SEQUENCE correspondenciaResultado
+			CHOICE identificacao
+				{0:identificacaoSecaoEleitoral,1:identificacaoContingencia}
+			IF 0:
+				SEQUENCE municipioZona 
+					INTEGER municipio
+					INTEGER zona 
+				INTEGER local 
+				INTEGER secao
+			IF 1:
+				SEQUENCE municipioZona 
+					INTEGER municipio
+					INTEGER zona
+			SEQUENCE carga 
+				INTEGER numeroInternoUrna
+				OCTET STRING numeroSerieFC 
+				SEQUENCE identificadorGeradorMidia 
+					GENERAL STRING nome 
+					GENERAL STRING serialCertificadoTPM 
+					GENERAL STRING serialInstalacao
+				GENERAL STRING dataHoraCarga 
+				GENERAL STRING codigoCarga 
+		ENUMERATED tipoArquivo
+			{1:votacaoUE,2:votacaoRED,3:saMistaMRParcialCedula,
+			 4:saMistaBUImpressoCedula,5:saManual,6:saEletronica}
+		OCTET STRING numeroSerieFV
+		IF motivoUtilizacaoSA:
+			CHOICE tipoApuracaoSA
+				{0:apuracaoMistaMR,1:apuracaoMistaBUAE,
+				 2:apuracaoTotalmenteManualDigitacaoAE,3:apuracaoEletronica}
+			IF 0:
+				SEQUENCE apuracaoMistaMR
+					ENUMERATED tipoApuracao
+						{1:totalmenteManual,2:totalmenteEletronica,
+						 3:mistaBU,4:mistaMR}
+					ENUMERATED motivoApuracao
+						{1:naoObteveExitoContingencia,
+						 2:indisponibilidadeUrnaContingencia,
+						 3:indisponibilidadeFlashContingencia,
+						 4:problemaEnergiaEletrica,
+						 5:naoFoiPossivelTrocarUrna,
+						 6:naoFoiSolicitadaTrocaUrna,
+						 99:outros}
+			IF 1:
+				SEQUENCE apuracaoMistaBUAE
+					ENUMERATED tipoApuracao
+						{1:totalmenteManual,2:totalmenteEletronica,
+						 3:mistaBU,4:mistaMR}
+					ENUMERATED motivoApuracao
+					   {1:urnaDataHoraIncorreta,2:urnaComDefeito,
+					    3:urnaOutrasecao,4:urnaPreparadaIncorretamente,
+					    5:urnaChegouAposInicioVotacao,99:outros}
+			IF 2:
+				SEQUENCE apuracaoTotalmenteManualDigitacaoAE
+					ENUMERATED tipoApuracao
+						{1:totalmenteManual,2:totalmenteEletronica,
+						 3:mistaBU,4:mistaMR}
+					ENUMERATED motivoApuracao
+					   {1:urnaComDefeito,2:urnaIndisponivelInicio,
+					    3:urnaOutrasecao,99:outros}
+			IF 3:
+				SEQUENCE apuracaoEletronica
+					ENUMERATED tipoApuracao
+						{1:totalmenteManual,2:totalmenteEletronica,
+						 3:mistaBU,4:mistaMR}
+					ENUMERATED motivoApuracao
+					   {1:naoFoiPossivelReuperarResultado,
+					    2:urnaNaoChegouMidiaDefeituosa,
+					    3:urnaNaoChegouMidiaExtraviada,99:outros}
+	SEQUENCE rdv
+		INTEGER pleito
+		ENUMERATED fase
+			{1:simulado,2:oficial,3:treinamento}
+		SEQUENCE identificacao 
+			SEQUENCE municipioZona
+				INTEGER municipio 
+				INTEGER zona
+			INTEGER local  
+			INTEGER secao
+		SEQUENCE OF historicoCodigosCarga
+			[GENERAL STRING codigoCarga]
+		CHOICE eleicoes
+			{1:eleicaoVota,2:eleicaoSA}
+		IF 1:
+			SEQUENCE eleicaoVota
+				INTEGER idEleicao
+				SEQUENCE OF votosCargos
+					[SEQUENCE votosCargo
+						CHOICE idCargo
+							{1:cargoConstitucional,2:numeroCargoConsultaLivre}
+						IF 1:
+							ENUMERATED cargoConstitucional
+								{1:presidente,3:governador,5:senador,
+								 6:deputadoFederal,7:deputadoEstadual,
+								 8:deputadoDistrital,11:prefeito,13:vereador}
+						INTEGER quantidadeEscolhas
+						SEQUENCE OF votos
+							[SEQUENCE voto 
+								ENUMERATED tipoVoto
+									{1:legenda,2:nominal,3:branco,4:nulo,
+									 5:brancoAposSuspensao,6:nuloAposSuspensao,
+									 7:nuloPorRepeticao,8:nuloCargoSemCandidato,
+									 9:nuloAposSuspensaoCargoSemCandidato}
+								IF digitacao:
+									NUMERIC STRING votoDigitado]]
+		IF 2:
+			SEQUENCE eleicaoSA
+				INTEGER idEleicao
+				ENUMERATED tipoCedulaSA
+					{1:majoritario,2:proporcional}
+				ENUMERATED origemVotosSA
+					{1:cedula,2:rdv,3:bu}
+				SEQUENCE OF votosCargos
+					[SEQUENCE votosCargo
+						CHOICE idCargo
+							{1:cargoConstitucional,2:numeroCargoConsultaLivre}
+						IF 1:
+							ENUMERATED cargoConstitucional
+								{1:presidente,3:governador,5:senador,
+								 6:deputadoFederal,7:deputadoEstadual,
+								 8:deputadoDistrital,11:prefeito,13:vereador}
+						INTEGER quantidadeEscolhas
+						SEQUENCE OF votos
+							[SEQUENCE voto 
+								ENUMERATED tipoVoto
+									{1:legenda,2:nominal,3:branco,4:nulo,
+									 5:brancoAposSuspensao,6:nuloAposSuspensao,
+									 7:nuloPorRepeticao,8:nuloCargoSemCandidato,
+									 9:nuloAposSuspensaoCargoSemCandidato}
+								IF digitacao:
+									NUMERIC STRING votoDigitado]]
+			
